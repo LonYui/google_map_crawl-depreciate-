@@ -1,7 +1,7 @@
 //根據關鍵字爬谷歌地圖的商家資料輸出成csv表
 //version 1.0
 let rows = []
-let store_num = 1;
+let store_num = 0//注意！從0開始
 let Interval = setInterval(() => {
     // 如果商店名稱dom存在於頁面的話
     let dummy = 0;
@@ -10,11 +10,14 @@ let Interval = setInterval(() => {
         alert('執行指令："export_csv()"下載爬取資料')
         killInterval()
     }
-    else if (getElementByXpath('//*[@id="pane"]/div/div[1]/div/div/div[2]/div[1]/div[1]/h1')) {
-        rows.push(get_store_info_row())
+    //當頁面不在店家頁面內
+    else if (!getElementByXpath('//*[@id="pane"]/div/div[1]/div/div/div[2]/div[1]/div[1]/h1')) {
+        choose_which_store_to_crawl((store_num) % 20)
     }
+    //當頁面在店家頁面內
     else {
-        choose_which_store_to_crawl(store_num)
+        rows.push(get_store_info_row())
+        store_num++
     }
 }, 2000);
 
@@ -49,10 +52,8 @@ function get_store_info_row() {
     return row
 }
 
-//input row
-function choose_which_store_to_crawl(row) {
-    store_num++
-    getElementByXpath('//*[@id="pane"]/div/div[1]/div/div/div[4]/div[1]/div[' + (2 * row - 1) + ']').click()
+function choose_which_store_to_crawl(row_num) {
+    getElementByXpath('//*[@id="pane"]/div/div[1]/div/div/div[4]/div[1]/div[' + (2 * row_num + 1) + ']').click()
 }
 
 function export_csv() {
