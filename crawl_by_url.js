@@ -4,11 +4,14 @@ let rows = []
 let store_num = 0//注意！從0開始
 let Interval = setInterval(() => {
     // 如果商店名稱dom存在於頁面的話
-    let dummy = 0;
-    if (store_num == 20) {
-        alert('結束爬取此業20個')
-        alert('執行指令："export_csv()"下載爬取資料')
-        killInterval()
+    var dummy = 0
+    var last_row_num = null
+    if (getElementByXpath('//*[@id="pane"]/div/div[1]/div/div/div[4]/div[2]/div/div[1]/span/span[2]')) {
+        last_row_num = getElementByXpath('//*[@id="pane"]/div/div[1]/div/div/div[4]/div[2]/div/div[1]/span/span[2]').innerHTML - 0
+    }
+    //當爬到清單最後一項目
+    if (store_num == last_row_num) {
+        (last_row_num % 20 == 0) ? change_page() : the_end()
     }
     //當頁面不在店家頁面內
     else if (!getElementByXpath('//*[@id="pane"]/div/div[1]/div/div/div[2]/div[1]/div[1]/h1')) {
@@ -16,6 +19,7 @@ let Interval = setInterval(() => {
     }
     //當頁面在店家頁面內
     else {
+        //TODO 防止重複
         rows.push(get_store_info_row())
         store_num++
     }
@@ -37,7 +41,12 @@ function get_store_info_row() {
         row.push('（空）')
     }
 //類型
-    row.push(getElementByXpath('//*[@id="pane"]/div/div[1]/div/div/div[2]/div[1]/div[2]/div/div[2]/span[1]/span[1]/button').innerHTML)
+    if (getElementByXpath('//*[@id="pane"]/div/div[1]/div/div/div[2]/div[1]/div[2]/div/div[2]/span[1]/span[1]/button')) {
+        row.push(getElementByXpath('//*[@id="pane"]/div/div[1]/div/div/div[2]/div[1]/div[2]/div/div[2]/span[1]/span[1]/button').innerHTML)
+    }
+    else {
+        row.push('（空）')
+    }
 //9-12
     var coulmn_number
     for (coulmn_number = 9; coulmn_number <= 15; coulmn_number++) {
@@ -56,13 +65,57 @@ function choose_which_store_to_crawl(row_num) {
     getElementByXpath('//*[@id="pane"]/div/div[1]/div/div/div[4]/div[1]/div[' + (2 * row_num + 1) + ']').click()
 }
 
-function export_csv() {
-    const rows_export = rows
-    let csvContent = "data:text/csv;charset=utf-8,"
-        + rows_export.map(e => e.join(",")).join("\n");
-    var encodedUri = encodeURI(csvContent);
-    window.open(encodedUri);
+function change_page() {
+    getElementByXpath('//*[@id="n7lv7yjyC35__section-pagination-button-next"]').click()
 }
+
+function exportToCsv(filename, rows) {
+    var processRow = function (row) {
+        var finalVal = '';
+        for (var j = 0; j < row.length; j++) {
+            var innerValue = row[j] === null ? '' : row[j].toString();
+            if (row[j] instanceof Date) {
+                innerValue = row[j].toLocaleString();
+            };
+            var result = innerValue.replace(/"/g, '""');
+            if (result.search(/("|,|\n)/g) >= 0)
+                result = '"' + result + '"';
+            if (j > 0)
+                finalVal += ',';
+            finalVal += result;
+        }
+        return finalVal + '\n';
+    };
+
+    var csvFile = '';
+    for (var i = 0; i < rows.length; i++) {
+        csvFile += processRow(rows[i]);
+    }
+
+    var blob = new Blob([csvFile], { type: 'text/csv;charset=utf-8;' });
+    if (navigator.msSaveBlob) { // IE 10+
+        navigator.msSaveBlob(blob, filename);
+    } else {
+        var link = document.createElement("a");
+        if (link.download !== undefined) { // feature detection
+            // Browsers that support HTML5 download attribute
+            var url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", filename);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    }
+}
+
+function the_end() {
+    alert('結束爬取此業20個')
+    alert('執行指令："exportToCsv(\'尚未命名\',rows)"下載爬取資料')
+    killInterval()
+}
+
 
 function killInterval() {
     clearInterval(Interval);
