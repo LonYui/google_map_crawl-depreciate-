@@ -19,11 +19,12 @@ let Interval = setInterval(() => {
     }
     //當頁面在店家頁面內
     else {
-        //若此業商家名稱 和 列表最後一行 名稱一樣 就不加入
-        if (rows[rows.length-1][0] == getElementByXpath('//*[@id="pane"]/div/div[1]/div/div/div[2]/div[1]/div[1]/h1').innerHTML){
-            return
+        if(rows!=0){
+            //若此業商家名稱 和 列表最後一行 名稱一樣 就不加入
+            if (rows[rows.length-1][0] == getElementByXpath('//*[@id="pane"]/div/div[1]/div/div/div[2]/div[1]/div[1]/h1').innerHTML){
+                return
+            }
         }
-
         rows.push(get_store_info_row())
         store_num++
     }
