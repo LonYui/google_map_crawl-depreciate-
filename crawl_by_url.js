@@ -37,7 +37,8 @@ function getElementByXpath(path) {
 function get_store_info_row() {
     var row = []
 //名稱
-    row.push(getElementByXpath('//*[@id="pane"]/div/div[1]/div/div/div[2]/div[1]/div[1]/h1').innerHTML)
+    var name = getElementByXpath('//*[@id="pane"]/div/div[1]/div/div/div[2]/div[1]/div[1]/h1').innerHTML
+    row.push(name)
 //星級
     if (getElementByXpath('//*[@id="pane"]/div/div[1]/div/div/div[2]/div[1]/div[2]/div/div[1]/span[1]/span/span')) {
         row.push(getElementByXpath('//*[@id="pane"]/div/div[1]/div/div/div[2]/div[1]/div[2]/div/div[1]/span[1]/span/span').innerHTML)
@@ -63,7 +64,12 @@ function get_store_info_row() {
     var coulmn_number
     for (coulmn_number = 9; coulmn_number <= 15; coulmn_number++) {
         if (getElementByXpath('//*[@id="pane"]/div/div[1]/div/div/div[' + coulmn_number + ']/div/div[1]/span[3]/span[3]')) {
-            row.push(getElementByXpath('//*[@id="pane"]/div/div[1]/div/div/div[' + coulmn_number + ']/div/div[1]/span[3]/span[3]').innerHTML)
+            if('facebook.com'===getElementByXpath('//*[@id="pane"]/div/div[1]/div/div/div[' + coulmn_number + ']/div/div[1]/span[3]/span[3]').innerHTML){
+                row.push('https://www.facebook.com/search/pages/?q='+name)
+            }
+            else{
+                row.push(getElementByXpath('//*[@id="pane"]/div/div[1]/div/div/div[' + coulmn_number + ']/div/div[1]/span[3]/span[3]').innerHTML)
+            }
         }
         else {
             row.push('（空）')
