@@ -1,5 +1,5 @@
 //（hotel特別版本） 根據關鍵字爬谷歌地圖的商家資料輸出成csv表
-//version 1.0
+//version 2.0 release date 200509
 let rows = []
 let store_num = 0//注意！從0開始
 
