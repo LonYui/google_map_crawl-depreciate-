@@ -26,8 +26,9 @@ let Interval = setInterval(() => {
                 return
             }
         }
-        rows.push(get_store_info_row())
-        store_num++
+        row = get_store_info_row()
+        if (row!==-1)//非重複
+            rows.push(row)
     }
 }, 2000);
 
@@ -40,6 +41,9 @@ function get_store_info_row() {
     var row = []
 //名稱
     var name = getElementByXpath('//*[@id="pane"]/div/div[1]/div/div/div[2]/div[1]/div[1]/h1').innerHTML
+    var rowsName = []
+    rows.forEach(ele=>rowsName.push(ele[0]))
+    if (name in rowsName)return -1
     row.push(name)
 //星級
     if (getElementByXpath('//*[@id="pane"]/div/div[1]/div/div/div[2]/div[1]/div[2]/div/div[1]/span[1]/span/span')) {
