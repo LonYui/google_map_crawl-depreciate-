@@ -1,4 +1,4 @@
-//根據關鍵字爬谷歌地圖的商家資料輸出成csv表 （hotel特別版本）
+//（hotel特別版本） 根據關鍵字爬谷歌地圖的商家資料輸出成csv表
 //version 1.0
 let rows = []
 let store_num = 0//注意！從0開始
@@ -29,6 +29,7 @@ let Interval = setInterval(() => {
         row = get_store_info_row()
         if (row!==-1)//非重複
             rows.push(row)
+        store_num++
     }
 }, 2000);
 
@@ -39,34 +40,34 @@ function getElementByXpath(path) {
 
 function get_store_info_row() {
     var row = []
-//名稱
+//名稱0
     var name = getElementByXpath('//*[@id="pane"]/div/div[1]/div/div/div[2]/div[1]/div[1]/h1').innerHTML
     var rowsName = []
     rows.forEach(ele=>rowsName.push(ele[0]))
     if (name in rowsName)return -1
     row.push(name)
-//星級
+//星級1
     if (getElementByXpath('//*[@id="pane"]/div/div[1]/div/div/div[2]/div[1]/div[2]/div/div[1]/span[1]/span/span')) {
         row.push(getElementByXpath('//*[@id="pane"]/div/div[1]/div/div/div[2]/div[1]/div[2]/div/div[1]/span[1]/span/span').innerHTML)
     }
     else {
         row.push('（空）')
     }
-//類型
+//類型2
     if (getElementByXpath('//*[@id="pane"]/div/div[1]/div/div/div[2]/div[1]/div[2]/div/div[2]/span[1]/span[1]/button')) {
         row.push(getElementByXpath('//*[@id="pane"]/div/div[1]/div/div/div[2]/div[1]/div[2]/div/div[2]/span[1]/span[1]/button').innerHTML)
     }
     else {
         row.push('（空）')
     }
-//價錢
+//價錢3
     if (getElementByXpath('//*[@id="pane"]/div/div[1]/div/div/div[1]/div[4]/div/button/div/jsl[2]/div[2]/span')) {
         row.push(getElementByXpath('//*[@id="pane"]/div/div[1]/div/div/div[1]/div[4]/div/button/div/jsl[2]/div[2]/span').innerHTML)
     }
     else {
         row.push('（空）')
     }
-//星集
+//星集4
     if (getElementByXpath('//*[@id="pane"]/div/div[1]/div/div/div[2]/div[1]/div[2]/div/div[1]/span[2]/span/span[2]/span[2]/span[1]/span')) {
         row.push(getElementByXpath('//*[@id="pane"]/div/div[1]/div/div/div[2]/div[1]/div[2]/div/div[1]/span[2]/span/span[2]/span[2]/span[1]/span').innerHTML)
     }
@@ -74,17 +75,25 @@ function get_store_info_row() {
         row.push('（空）')
     }
 
+//手機5
+    row.push('沒有手機')
+//網址6
+    row.push('沒有網址')
+
 //14-20
     var coulmn_number
     for (coulmn_number = 14; coulmn_number <= 20; coulmn_number++) {
 
         if (getElementByXpath('//*[@id="pane"]/div/div[1]/div/div/div[' + coulmn_number + ']/div/div[1]/span[3]/span[3]')) {
-            if('facebook.com'===getElementByXpath('//*[@id="pane"]/div/div[1]/div/div/div[' + coulmn_number + ']/div/div[1]/span[3]/span[3]').innerHTML){
-                row.push('https://www.facebook.com/search/pages/?q='+name)
-            }
-            else{
+            var text = getElementByXpath('//*[@id="pane"]/div/div[1]/div/div/div[' + coulmn_number + ']/div/div[1]/span[3]/span[3]').innerHTML
+            if(isFB(text))
+                row[6]='https://www.facebook.com/search/pages/?q='+name
+            else if(isPhoneNumber(text))
+                row[5] = text
+            else if(isUrl(text))
+                row[6]=text
+            else
                 row.push(getElementByXpath('//*[@id="pane"]/div/div[1]/div/div/div[' + coulmn_number + ']/div/div[1]/span[3]/span[3]').innerHTML)
-            }
         }
         else {
             row.push('（空）')
@@ -151,4 +160,19 @@ function the_end() {
 
 function killInterval() {
     clearInterval(Interval);
+}
+
+function isPhoneNumber(text){
+    if (text[0]==='0' && text[1]==='9') return true
+    else return false
+}
+
+function isUrl (text) {
+    if (text.search('.com')!==-1)return  true
+    else if (text.search('.net')!==-1)return true
+    else return false
+}
+function isFB(text) {
+    if(text.search('facebook.com')!==-1) return true
+    else return false
 }

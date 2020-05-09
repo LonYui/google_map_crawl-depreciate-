@@ -38,43 +38,50 @@ function getElementByXpath(path) {
 
 function get_store_info_row() {
     var row = []
-//名稱
+//名稱0
     var name = getElementByXpath('//*[@id="pane"]/div/div[1]/div/div/div[2]/div[1]/div[1]/h1').innerHTML
     var rowsName = []
     rows.forEach(ele=>rowsName.push(ele[0]))
     if (name in rowsName)return -1
     row.push(name)
-//星級
+//星級1
     if (getElementByXpath('//*[@id="pane"]/div/div[1]/div/div/div[2]/div[1]/div[2]/div/div[1]/span[1]/span/span')) {
         row.push(getElementByXpath('//*[@id="pane"]/div/div[1]/div/div/div[2]/div[1]/div[2]/div/div[1]/span[1]/span/span').innerHTML)
     }
     else {
         row.push('（空）')
     }
-//價位
+//價位2
     if (getElementByXpath('//*[@id="pane"]/div/div[1]/div/div/div[2]/div[1]/div[2]/div/div[1]/span[2]/span/span[2]/span[2]/span[1]/span')) {
         row.push(getElementByXpath('//*[@id="pane"]/div/div[1]/div/div/div[2]/div[1]/div[2]/div/div[1]/span[2]/span/span[2]/span[2]/span[1]/span').innerHTML)
     }
     else {
         row.push('（空）')
     }
-//類型
+//類型3
     if (getElementByXpath('//*[@id="pane"]/div/div[1]/div/div/div[2]/div[1]/div[2]/div/div[2]/span[1]/span[1]/button')) {
         row.push(getElementByXpath('//*[@id="pane"]/div/div[1]/div/div/div[2]/div[1]/div[2]/div/div[2]/span[1]/span[1]/button').innerHTML)
     }
     else {
         row.push('（空）')
     }
+//手機4
+    row.push('沒有手機')
+//網址5
+    row.push('沒有網址')
 //9-12
     var coulmn_number
     for (coulmn_number = 9; coulmn_number <= 15; coulmn_number++) {
         if (getElementByXpath('//*[@id="pane"]/div/div[1]/div/div/div[' + coulmn_number + ']/div/div[1]/span[3]/span[3]')) {
-            if('facebook.com'===getElementByXpath('//*[@id="pane"]/div/div[1]/div/div/div[' + coulmn_number + ']/div/div[1]/span[3]/span[3]').innerHTML){
-                row.push('https://www.facebook.com/search/pages/?q='+name)
-            }
-            else{
+            var text = getElementByXpath('//*[@id="pane"]/div/div[1]/div/div/div[' + coulmn_number + ']/div/div[1]/span[3]/span[3]').innerHTML
+            if(isFB(text))
+                row[5]='https://www.facebook.com/search/pages/?q='+name
+            else if(isPhoneNumber(text))
+                row[4] = text
+            else if(isUrl(text))
+                row[5]=text
+            else
                 row.push(getElementByXpath('//*[@id="pane"]/div/div[1]/div/div/div[' + coulmn_number + ']/div/div[1]/span[3]/span[3]').innerHTML)
-            }
         }
         else {
             row.push('（空）')
@@ -142,4 +149,19 @@ function the_end() {
 
 function killInterval() {
     clearInterval(Interval);
+}
+
+function isPhoneNumber(text){
+    if (text[0]==='0' && text[1]==='9') return true
+    else return false
+}
+
+function isUrl (text) {
+    if (text.search('.com')!==-1)return  true
+    else if (text.search('.net')!==-1)return true
+    else return false
+}
+function isFB(text) {
+    if(text.search('facebook.com')!==-1) return true
+    else return false
 }
