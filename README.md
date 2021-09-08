@@ -1,5 +1,7 @@
-# google_map_crawl
+# google_map_crawl(unwork0908)
 根據關鍵字爬谷歌地圖的商家資料輸出成csv表
+warn!
+0908 google 使用動態加載功能阻止了此爬蟲程式
 
 ## 操作步驟（MAC）
 
